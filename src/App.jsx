@@ -47,7 +47,7 @@ function App() {
    return (
       <div className="relative flex flex-col">
          <h1 className="text-2xl mb-5 text-center">Marketing</h1>
-         <table className="w-full text-left table-auto min-w-max border-collapse">
+         <table className="w-80 mx-auto text-left mt-5 table-auto min-w-max border-collapse">
             <tbody>
                {items.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50">
@@ -87,7 +87,7 @@ function App() {
                   <td className="p-4  border-b border-slate-200">
                      <input
                         type="number"
-                        className="block w-full text-sm text-slate-800 p-1 "
+                        className="block w-full text-center text-sm text-slate-800 p-1 "
                         value={agentContribution}
                         onChange={handleAgentContributionChange}
                         placeholder="Enter contribution"
@@ -104,12 +104,11 @@ function App() {
                </tr>
                {/* Total row */}
                <tr className="hover:bg-slate-50 font-semibold">
-                  <td className="p-4 border-t border-slate-200 border-r border-slate-300">
+                  <td className="p-4 border-t text-center border-slate-200 border-r border-slate-300">
                      TOTAL
                   </td>
-                  <td className="p-4 border-t border-slate-200">
+                  <td className="p-4 border-t text-center border-slate-200">
                      ${finalTotal >= 0 ? finalTotal : 0}{" "}
-                     {/* Ensure the total is at least 0 */}
                   </td>
                   <td className="p-4 border-t border-slate-200"></td>
                </tr>
