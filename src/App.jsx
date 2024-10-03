@@ -45,9 +45,14 @@ function App() {
       ? totalPrice - agentContribution
       : totalPrice;
    return (
-      <div className="relative flex flex-col">
-         <h1 className="text-2xl mb-5 text-center">Marketing</h1>
-         <table className="w-80 mx-auto text-left mt-5 table-auto min-w-max border-collapse">
+      <div className="relative mx-auto w-full md:w-80 flex flex-col">
+         <h1 className="text-2xl mb-5 text-center roboto-regular tracking-widest">
+            MARKETING
+         </h1>
+         <div className="flex justify-end  pb-10 mt-4">
+            <button className="text-black">ADD NEW +</button>
+         </div>
+         <table className="  text-left   table-auto min-w-max border-collapse">
             <tbody>
                {items.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50">
@@ -114,6 +119,7 @@ function App() {
                </tr>
             </tbody>
          </table>
+
          <div className="flex justify-center mt-5">
             <button className="bg-gray-300 text-black  px-10 rounded-full">
                PAY LATER
