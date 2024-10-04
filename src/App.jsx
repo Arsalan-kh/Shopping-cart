@@ -113,7 +113,7 @@ function App() {
                      TOTAL
                   </td>
                   <td className="p-4 border-t text-center border-slate-200">
-                     ${finalTotal >= 0 ? finalTotal : 0}{" "}
+                     ${finalTotal}
                   </td>
                   <td className="p-4 border-t border-slate-200"></td>
                </tr>
