@@ -73,7 +73,9 @@ function App() {
                {({ open }) => (
                   <>
                      <DisclosureButton className="w-full cursor-pointer border-b-1 bg-lightgray p-1 flex items-center justify-between">
-                        <h2 className="text-lg py-3 ">{category.heading}</h2>
+                        <h2 className="text-lg font-semibold py-2 ">
+                           {category.heading}
+                        </h2>
                         <ChevronDownIcon
                            className={`w-5 h-5 transition-transform duration-300 ${
                               open ? "rotate-180" : ""
