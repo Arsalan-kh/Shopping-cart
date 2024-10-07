@@ -7,9 +7,10 @@ import {
    DisclosurePanel,
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { formatCurrency } from "./utils/utils";
 function App() {
    const [items, setItems] = useState(accordionData);
-   const [agentContribution, setAgentContribution] = useState(0);
+   const [agentContribution, setAgentContribution] = useState("$0");
 
    const [isAgentContributionChecked, setIsAgentContributionChecked] =
       useState(false);
@@ -40,8 +41,13 @@ function App() {
    };
 
    const handleAgentContributionChange = (e) => {
-      const value = Math.max(0, parseFloat(e.target.value) || 0);
-      setAgentContribution(value);
+      const value = e.target.value;
+
+      // Use split to remove the dollar sign and extract numeric part
+      const numericValue = value.split("$")[1]?.replace(/,/g, "") || "0"; // Get numeric part after the dollar sign
+      const parsedValue = Math.max(0, parseFloat(numericValue) || 0); // Parse the number and ensure it's non-negative
+
+      setAgentContribution(formatCurrency(parsedValue)); // Set formatted value
    };
 
    const handleAgentContributionCheckboxChange = () => {
@@ -61,93 +67,98 @@ function App() {
    );
 
    // Apply agent contribution if applicable
-   const finalTotal = isAgentContributionChecked
-      ? totalPrice - agentContribution
-      : totalPrice;
+   const finalTotal = Math.max(
+      0,
+      isAgentContributionChecked
+         ? totalPrice -
+              parseFloat(agentContribution.replace(/^\$/, "").replace(/,/g, ""))
+         : totalPrice // Extract numeric value from formatted agent contribution
+   );
 
    return (
-      <div className="w-94 mx-auto">
+      <div className=" mx-auto">
          <h1 className="text-2xl mb-5 text-center">MARKETING</h1>
-         {items.map((category, categoryIndex) => (
-            <Disclosure className="" key={categoryIndex}>
-               {({ open }) => (
-                  <>
-                     <DisclosureButton className="w-full cursor-pointer border-b-1 bg-lightgray p-1 flex items-center justify-between">
-                        <h2 className="text-lg font-semibold py-2 ">
-                           {category.heading}
-                        </h2>
-                        <ChevronDownIcon
-                           className={`w-5 h-5 transition-transform duration-300 ${
-                              open ? "rotate-180" : ""
-                           }`}
-                        />
-                     </DisclosureButton>
-                     <DisclosurePanel
-                        transition
-                        className="origin-top transition duration-200 ease-out data-[closed]:-translate-y-6 data-[closed]:opacity-0"
-                     >
-                        <table className="w-full  mt-2">
-                           <tbody>
-                              {category.items.map((item) => (
-                                 <tr
-                                    key={item.id}
-                                    className="hover:bg-slate-50  "
-                                 >
-                                    <td className="p-2 border-b  border-slate-200">
-                                       {item.name}
-                                    </td>
-                                    <td className="p-2 border-b border-slate-200">
-                                       $ {item.price}
-                                    </td>
-                                    <td className="p-2 border-b border-slate-200">
-                                       <input
-                                          type="checkbox"
-                                          checked={item.isChecked}
-                                          onChange={() =>
-                                             handleCheckboxChange(item.id)
-                                          }
-                                       />
-                                    </td>
-                                 </tr>
-                              ))}
-                           </tbody>
-                        </table>
-                     </DisclosurePanel>
-                  </>
-               )}
-            </Disclosure>
-         ))}
 
-         {/* Agent Contribution */}
-         <table className="w-full mt-5 border border-lightgray">
+         <table className="w-full  flex justify-end border-lightgray">
             <tbody>
-               <tr className="hover:bg-slate-50">
-                  <td className="p-4 border-b border-slate-200">
-                     Agent Contribution
-                  </td>
-                  <td className="p-4 border-b border-slate-200">
-                     <input
-                        type="number"
-                        className="w-full text-center p-1"
-                        value={agentContribution}
+               {/* Loop through items and categories */}
+               {items.map((category, categoryIndex) => (
+                  <>
+                     {/* Category Heading Row with Chevron */}
+                     <Disclosure>
+                        {({ open }) => (
+                           <>
+                              <DisclosureButton className="w-full cursor-pointer bg-lightgray p-4 flex items-center justify-between">
+                                 <h2 className="">{category.heading}</h2>
+                                 <ChevronDownIcon
+                                    className={`w-5 h-5 transition-transform duration-300 ${
+                                       open ? "rotate-180" : ""
+                                    }`}
+                                 />
+                              </DisclosureButton>
+                              {/* Items for this category */}
+                              <DisclosurePanel className="origin-top transition duration-200 ease-out">
+                                 {category.items.map((item) => (
+                                    <tr
+                                       key={item.id}
+                                       className="hover:bg-slate-50 border-b border-slate-200 flex justify-between "
+                                    >
+                                       <td className="p-4 ">{item.name}</td>
+                                       <div className="">
+                                          <td className="p-4 ">
+                                             {formatCurrency(item.price)}
+                                          </td>
+                                          <td className="p-4 ">
+                                             <input
+                                                type="checkbox"
+                                                checked={item.isChecked}
+                                                onChange={() =>
+                                                   handleCheckboxChange(item.id)
+                                                }
+                                             />
+                                          </td>
+                                       </div>
+                                    </tr>
+                                 ))}
+                              </DisclosurePanel>
+                           </>
+                        )}
+                     </Disclosure>
+                  </>
+               ))}
+
+               {/* Agent Contribution Row */}
+               <tr className="hover:bg-slate-50 border-b border-slate-200 flex justify-between">
+                  <td className="p-4 ">Agent Contribution</td>
+                  <div>
+                     <td
                         onChange={handleAgentContributionChange}
-                        placeholder="Enter contribution"
-                     />
-                  </td>
-                  <td className="p-4 border-b border-slate-200">
-                     <input
-                        type="checkbox"
-                        checked={isAgentContributionChecked}
-                        onChange={handleAgentContributionCheckboxChange}
-                     />
-                  </td>
+                        className="p-4 "
+                     >
+                        <input
+                           type="text"
+                           className="w-full text-right "
+                           placeholder="$0"
+                           value={agentContribution}
+                           onChange={handleAgentContributionChange}
+                        />
+                     </td>
+                     <td className="p-4 ">
+                        <input
+                           type="checkbox"
+                           checked={isAgentContributionChecked}
+                           onChange={handleAgentContributionCheckboxChange}
+                        />
+                     </td>
+                  </div>
                </tr>
 
-               {/* Total */}
-               <tr className="hover:bg-slate-50 font-semibold">
+               {/* Total Row */}
+               <tr className="hover:bg-slate-50 font-semibold flex justify-between">
                   <td className="p-4 border-t text-center">TOTAL</td>
-                  <td className="p-4 border-t text-center">${finalTotal}</td>
-                  <td className="p-4 border-t"></td>
+                  <td className="p-4 border-t text-center">
+                     {formatCurrency(finalTotal)}
+                  </td>
                </tr>
             </tbody>
          </table>
