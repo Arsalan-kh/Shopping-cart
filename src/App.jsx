@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { marketingItems, accordionData } from "./helper";
 import {
@@ -8,13 +8,14 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { formatCurrency } from "./utils/utils";
-function App() {
-   const [items, setItems] = useState(accordionData);
-   const [agentContribution, setAgentContribution] = useState("$0");
 
+import useFetchCategories from "./hooks/useFetchItems";
+// import MarketingPriceList from "./Item";
+function App() {
+   const { categories, setCategories, loading, error } = useFetchCategories();
+   const [agentContribution, setAgentContribution] = useState("$0");
    const [isAgentContributionChecked, setIsAgentContributionChecked] =
       useState(false);
-
    // // Handle price change
    // const handlePriceChange = (id, newPrice) => {
    //    const value = Math.max(0, parseFloat(newPrice) || 0);
@@ -29,12 +30,14 @@ function App() {
    // };
 
    // Handle checkbox change
+
    const handleCheckboxChange = (id) => {
-      setItems((prevItems) =>
-         prevItems.map((category) => ({
+      console.log("categoryes", categories);
+      setCategories((prevCategories) =>
+         prevCategories.map((category) => ({
             ...category,
             items: category.items.map((item) =>
-               item.id === id ? { ...item, isChecked: !item.isChecked } : item
+               item._id === id ? { ...item, isChecked: !item.isChecked } : item
             ),
          }))
       );
@@ -42,7 +45,6 @@ function App() {
 
    const handleAgentContributionChange = (e) => {
       const value = e.target.value;
-
       // Use split to remove the dollar sign and extract numeric part
       const numericValue = value.split("$")[1]?.replace(/,/g, "") || "0"; // Get numeric part after the dollar sign
       const parsedValue = Math.max(0, parseFloat(numericValue) || 0); // Parse the number and ensure it's non-negative
@@ -55,7 +57,7 @@ function App() {
    };
 
    // Calculate total price for selected items
-   const totalPrice = items.reduce(
+   const totalPrice = categories.reduce(
       (total, category) =>
          total +
          category.items.reduce(
@@ -65,7 +67,6 @@ function App() {
          ),
       0
    );
-
    // Apply agent contribution if applicable
    const finalTotal = Math.max(
       0,
@@ -82,14 +83,14 @@ function App() {
          <table className="w-full  flex justify-end border-lightgray">
             <tbody>
                {/* Loop through items and categories */}
-               {items.map((category, categoryIndex) => (
+               {categories.map((category, categoryIndex) => (
                   <>
                      {/* Category Heading Row with Chevron */}
                      <Disclosure>
                         {({ open }) => (
                            <>
                               <DisclosureButton className="w-full cursor-pointer bg-lightgray p-4 flex items-center justify-between">
-                                 <h2 className="">{category.heading}</h2>
+                                 <h2 className="">{category.category}</h2>
                                  <ChevronDownIcon
                                     className={`w-5 h-5 transition-transform duration-300 ${
                                        open ? "rotate-180" : ""
@@ -100,20 +101,24 @@ function App() {
                               <DisclosurePanel className="origin-top transition duration-200 ease-out">
                                  {category.items.map((item) => (
                                     <tr
-                                       key={item.id}
+                                       key={item._id}
                                        className="hover:bg-slate-50 border-b border-slate-200 flex justify-between "
                                     >
-                                       <td className="p-4 ">{item.name}</td>
+                                       <td className="py-2 px-3">
+                                          {item.name}
+                                       </td>
                                        <div className="">
-                                          <td className="p-4 ">
+                                          <td className="py-2 px-3 ">
                                              {formatCurrency(item.price)}
                                           </td>
-                                          <td className="p-4 ">
+                                          <td className="py-2 px-3 ">
                                              <input
                                                 type="checkbox"
                                                 checked={item.isChecked}
                                                 onChange={() =>
-                                                   handleCheckboxChange(item.id)
+                                                   handleCheckboxChange(
+                                                      item._id
+                                                   )
                                                 }
                                              />
                                           </td>
@@ -129,11 +134,11 @@ function App() {
 
                {/* Agent Contribution Row */}
                <tr className="hover:bg-slate-50 border-b border-slate-200 flex justify-between">
-                  <td className="p-4 ">Agent Contribution</td>
+                  <td className="py-2 px-3 ">Agent Contribution</td>
                   <div>
                      <td
                         onChange={handleAgentContributionChange}
-                        className="p-4 "
+                        className="py-2 px-3 "
                      >
                         <input
                            type="text"
@@ -143,7 +148,7 @@ function App() {
                            onChange={handleAgentContributionChange}
                         />
                      </td>
-                     <td className="p-4 ">
+                     <td className="py-2 px-3 ">
                         <input
                            type="checkbox"
                            checked={isAgentContributionChecked}
@@ -155,8 +160,8 @@ function App() {
 
                {/* Total Row */}
                <tr className="hover:bg-slate-50 font-semibold flex justify-between">
-                  <td className="p-4 border-t text-center">TOTAL</td>
-                  <td className="p-4 border-t text-center">
+                  <td className="py-2 px-3 border-t text-center">TOTAL</td>
+                  <td className="py-2 px-3 border-t text-center">
                      {formatCurrency(finalTotal)}
                   </td>
                </tr>
@@ -171,8 +176,8 @@ function App() {
          <div className="flex justify-center mt-2 text-gray-500">
             OR SAVE 6% AND PAY NOW
          </div>
+         {/* <MarketingPriceList /> */}
       </div>
    );
 }
-
 export default App;
